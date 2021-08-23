@@ -62,6 +62,7 @@ attr_reader :deck
     @boot.count
   end
 
+
 end
 
 class Player
@@ -74,7 +75,7 @@ class Player
 end
 
 class Blackjack
-  attr_reader :boot, :player, :dealer
+  attr_accessor :boot, :player, :dealer
     def initialize
      @boot = DeckBoot.new
      @player = Player.new("player")
@@ -100,8 +101,7 @@ class Blackjack
         end
     end
 
-    def deal_hand(keep_playing=true, cards_left=312)
-      binding.pry
+    def deal_hand(keep_playing=true)
       draw_card(player)
       draw_card(dealer)
       draw_card(player)
@@ -110,17 +110,12 @@ class Blackjack
 
       if player.score == 21 && dealer.score != 21
        messae = "Blackjack!"
-      elsif   player.score == 21 && dealer.score = 21
+      elsif   player.score == 21 && dealer.score == 21
         message = "Push Tied blackjack!"
       else
         hit_player(player)
         if player.score > 21
           message = "You busted with a score of #{player.score}"
-        else
-            cards = []
-            player.hand.each do |card|
-              cards << "#{card.rank} of #{card.suit}"
-            end
         end
       end
 
@@ -128,7 +123,13 @@ class Blackjack
         hit_player(dealer)
       end
 
-      if player.score > dealer.score
+
+      cards = []
+         player.hand.each do |card|
+          cards << "#{card.rank} of #{card.suit}"
+      end
+
+      if player.score > dealer.score && player.score <= 21
         message = "You won with a #{player.score} beating the dealer with #{dealer.score}! With a #{cards.join(", ")}!"
       elsif dealer.score > 21
         message = "Dealer bused with #{dealer.score}. You won!"
@@ -146,8 +147,22 @@ class Blackjack
 
         dealer.score = 0
         dealer.hand = []
-        binding.pry
-        deal_hand(keep_playing)
+
+
+        if boot.count <= 104
+          @boot = @boot = DeckBoot.new
+          puts "Shuffling"
+          puts "Do you wish to continue playing? (Y/N)"
+          p = gets.chomp
+          if p == "Y" || p == "y"
+            deal_hand(keep_playing)
+          else
+              puts "Good Game!"
+          end
+        else
+          deal_hand(keep_playing)
+        end
+
       else
         puts message
       end
