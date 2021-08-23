@@ -181,5 +181,15 @@ class Blackjack
 
 end
 
-play = Blackjack.new
-play.deal_hand
+
+
+def play_once
+  play = Blackjack.new
+  play.deal_hand(false)
+end
+
+def keep_playing
+  play = Blackjack.new
+  play.deal_hand(true)
+end
+
