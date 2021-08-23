@@ -56,8 +56,6 @@ attr_reader :deck
 
   def draw_card
       @player_card = @boot.shift
-      puts "Boot count is now at #{@boot.count}"
-      @player_card
   end
 
   def count
@@ -66,66 +64,103 @@ attr_reader :deck
 
 end
 
+class Player
+  attr_accessor :score, :hand
+  def initialize(name)
+    @name = name
+    @score = 0
+    @hand = []
+  end
+end
 
 class Blackjack
-  attr_reader :boot
+  attr_reader :boot, :player, :dealer
     def initialize
      @boot = DeckBoot.new
-     @score = 0
-     @hand = []
-     @dealer_hand = []
-     @dealer_score = 0
+     @player = Player.new("player")
+     @dealer = Player.new("dealer")
     end
 
-    def draw_card
-      @hand << boot.draw_card
-      get_score(@hand[-1])
+    def draw_card(player)
+      player.hand << boot.draw_card
+      get_score(player.hand[-1], player)
     end
 
-    def get_score(card)
+    def get_score(card, player)
         if card.rank == "K" || card.rank == "Q" || card.rank == "J"
-          @score += 10
+          player.score += 10
         elsif card.rank == "A"
-          @score += 11
+          player.score += 11
         else
-          @score += card.rank.to_i
+          player.score += card.rank.to_i
         end
 
-        if @score > 21 && @hand.any? { |card| card.rank == "A"}
-          @score -= 10
+        if player.score> 21 && player.hand.any? { |card| card.rank == "A"}
+          player.score -= 10
         end
     end
 
-    def deal_hand
-      draw_card
-      draw_card
-
-      message = "Blackjack"
-      puts "You score is #{@score}! with a #{@hand[0].rank} of #{@hand[0].suit} and #{@hand[1].rank} of #{@hand[1].suit}"
-
-      if @score == 21
-        return puts message
-      else
-        hit_me
-
-        if @score > 21
-          message = "You busted with a score of #{@score}"
-        end
-
-        if score == 21
-          message
-        end
-
-
-      end
+    def deal_hand(keep_playing=true, cards_left=312)
       binding.pry
-      puts message
+      draw_card(player)
+      draw_card(dealer)
+      draw_card(player)
+      draw_card(dealer)
+
+
+      if player.score == 21 && dealer.score != 21
+       messae = "Blackjack!"
+      elsif   player.score == 21 && dealer.score = 21
+        message = "Push Tied blackjack!"
+      else
+        hit_player(player)
+        if player.score > 21
+          message = "You busted with a score of #{player.score}"
+        else
+            cards = []
+            player.hand.each do |card|
+              cards << "#{card.rank} of #{card.suit}"
+            end
+        end
+      end
+
+      if dealer.score <= 17
+        hit_player(dealer)
+      end
+
+      if player.score > dealer.score
+        message = "You won with a #{player.score} beating the dealer with #{dealer.score}! With a #{cards.join(", ")}!"
+      elsif dealer.score > 21
+        message = "Dealer bused with #{dealer.score}. You won!"
+      elsif player.score < dealer.score
+        message = "Dealer won with a #{dealer.score} to your #{player.score}"
+      elsif player.score == dealer.score
+        message = "Tie score Push!!"
+      end
+
+      if keep_playing
+        puts message
+
+        player.score = 0
+        player.hand = []
+
+        dealer.score = 0
+        dealer.hand = []
+        binding.pry
+        deal_hand(keep_playing)
+      else
+        puts message
+      end
     end
 
-    def hit_me
-      while @score <= 17
-        draw_card
-        hit_me
+
+    def hit_player(player)
+      while player.score <= 17
+        draw_card(player)
+        if player.score > 21 && player.hand[-1].rank == "A"
+          player.score -= 10
+        end
+        hit_player(player)
       end
     end
 
