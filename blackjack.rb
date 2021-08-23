@@ -7,10 +7,10 @@ class Card
 
   def initialize(rank, suit)
     @rank = rank
-    @suite = suit
+    @suit = suit
   end
 
-  def outout_card
+  def output_card
     puts "#{self.rank} of #{self.suit}"
   end
 end
@@ -72,16 +72,64 @@ class Blackjack
     def initialize
      @boot = DeckBoot.new
      @score = 0
-     @cards = []
+     @hand = []
+     @dealer_hand = []
+     @dealer_score = 0
     end
 
-    def play_game
-      @cards << boot.draw_card
+    def draw_card
+      @hand << boot.draw_card
+      get_score(@hand[-1])
+    end
+
+    def get_score(card)
+        if card.rank == "K" || card.rank == "Q" || card.rank == "J"
+          @score += 10
+        elsif card.rank == "A"
+          @score += 11
+        else
+          @score += card.rank.to_i
+        end
+
+        if @score > 21 && @hand.any? { |card| card.rank == "A"}
+          @score -= 10
+        end
+    end
+
+    def deal_hand
+      draw_card
+      draw_card
+
+      message = "Blackjack"
+      puts "You score is #{@score}! with a #{@hand[0].rank} of #{@hand[0].suit} and #{@hand[1].rank} of #{@hand[1].suit}"
+
+      if @score == 21
+        return puts message
+      else
+        hit_me
+
+        if @score > 21
+          message = "You busted with a score of #{@score}"
+        end
+
+        if score == 21
+          message
+        end
+
+
+      end
       binding.pry
+      puts message
     end
 
+    def hit_me
+      while @score <= 17
+        draw_card
+        hit_me
+      end
+    end
 
 end
 
 play = Blackjack.new
-play.play_game
+play.deal_hand
