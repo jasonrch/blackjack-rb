@@ -83,6 +83,8 @@ describe Blackjack do
     play.get_score(five, play.player)
     play.get_score(five, play.player)
     play.get_score(five, play.player)
+
+    expect(play.player.score).to  eq(16)
   end
 end
 
