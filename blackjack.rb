@@ -13,7 +13,7 @@ class Card
 end
 
 class Deck
-  attr_reader :card
+  attr_reader :card, :deck
   def initialize
     @deck = []
     suits = ["spades", "diamonds", "hearts", "clubs"]
@@ -27,29 +27,31 @@ class Deck
     end
   end
 
-  def get_deck
-    @deck.each do |card|
-
-      card
-    end
+  def count
+    @deck.count
   end
 
 end
 
 class DeckBoot
-attr_reader :deck
+attr_reader :deck, :boot
   def initialize
     @boot = []
     boots = 0
     begin
       @deck = Deck.new
 
-      @boot << @deck.get_deck
+      @boot << @deck.deck
 
       boots += 1
     end until boots == 6
-    @boot = @boot.flatten.shuffle!
+    @boot = @boot.flatten
   end
+
+  def shuffle
+    @boot = @boot.shuffle!
+  end
+
 
   def draw_card
       @player_card = @boot.shift
@@ -76,6 +78,7 @@ class Blackjack
   attr_accessor :boot, :player, :dealer
     def initialize
      @boot = DeckBoot.new
+     @boot.shuffle
      @player = Player.new("player")
      @dealer = Player.new("dealer")
     end
@@ -86,29 +89,23 @@ class Blackjack
     end
 
     def get_score(card, player)
-
         if card.rank == "K" || card.rank == "Q" || card.rank == "J"
           player.score += 10
         elsif card.rank == "A"
           player.ace_count += 1
           player.score += 11
-          flip_aces
         else
           player.score += card.rank.to_i
         end
 
-
-
+        flip_aces
     end
 
     def flip_aces
-      if player.score <= 11
-        player.score += 11
-      else
-        while player.score > 21 && player.ace_count > 0
-          player.ace_count -=  1
-          player.score -= 10
-        end
+      binding.pry
+      while player.score > 21 && player.ace_count > 0
+        player.ace_count -=  1
+        player.score -= 10
       end
     end
 
