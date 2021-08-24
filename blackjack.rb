@@ -10,9 +10,6 @@ class Card
     @suit = suit
   end
 
-  def output_card
-    puts "#{self.rank} of #{self.suit}"
-  end
 end
 
 class Deck
