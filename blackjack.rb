@@ -66,10 +66,11 @@ attr_reader :deck
 end
 
 class Player
-  attr_accessor :score, :hand
+  attr_accessor :score, :hand, :ace_count
   def initialize(name)
     @name = name
     @score = 0
+    @ace_count = 0
     @hand = []
   end
 end
@@ -88,17 +89,30 @@ class Blackjack
     end
 
     def get_score(card, player)
+
         if card.rank == "K" || card.rank == "Q" || card.rank == "J"
           player.score += 10
         elsif card.rank == "A"
+          player.ace_count += 1
           player.score += 11
+          flip_aces
         else
           player.score += card.rank.to_i
         end
 
-        if player.score> 21 && player.hand.any? { |card| card.rank == "A"}
+
+
+    end
+
+    def flip_aces
+      if player.score <= 11
+        player.score += 11
+      else
+        while player.score > 21 && player.ace_count > 0
+          player.ace_count -=  1
           player.score -= 10
         end
+      end
     end
 
     def deal_hand(keep_playing=true)
