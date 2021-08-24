@@ -102,7 +102,6 @@ class Blackjack
     end
 
     def flip_aces
-      binding.pry
       while player.score > 21 && player.ace_count > 0
         player.ace_count -=  1
         player.score -= 10
